@@ -1,0 +1,8 @@
+{
+  "name": "leo-r-style",
+  "version": "1.0.0",
+  "description": "Ao Lu's compact R coding style for analysis scripts, R Markdown, and package code, with explicit file-type routing and package conventions.",
+  "author": "laleoarrow",
+  "keywords": ["r", "rscript", "rmd", "style", "analysis", "package", "ai-agent"],
+  "license": "MIT"
+}
