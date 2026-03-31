@@ -1,0 +1,4 @@
+interface:
+  display_name: "LEO R Style"
+  short_description: "Enforce LEO-style R package coding conventions"
+  default_prompt: "Use $leo-r-style to refactor this R package function to my preferred coding style."
