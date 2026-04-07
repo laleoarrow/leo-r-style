@@ -35,7 +35,9 @@ Classify the target before editing:
 ## R Code Style (Strict) / R 代码风格（严格）
 
 1. Use Tidyverse style (`%>%`) where appropriate, and prefer dataframe workflows (`df`) over named vectors.
-2. Booleans: `T` / `F` are acceptable for brevity.
+   - Prefer `%>%` over base pipe `|>` unless the user or project explicitly adopted `|>`. Do not silently switch between the two.
+2. Booleans: `T` / `F` are acceptable for brevity in analysis scripts.
+   - In **R package code** (`R/` directory), use `TRUE` / `FALSE` to satisfy `R CMD check` and `lintr`. `T`/`F` are only shorthand-safe in interactive `.R` and `.Rmd`.
 3. Naming and formatting:
 - Avoid excessive abbreviations (`df` is OK, `tr` is not).
 - Use meaningful snake_case names, for example `leo_log`, `train_path`.
@@ -52,6 +54,7 @@ Classify the target before editing:
 - Prefer explicit `for (...) {}` / `if (...) {}` over `map*` for clarity.
 - Keep loops and conditions compact.
 7. Use `leo_log(...)` directly; do not write `leo_log(glue::glue(...))`.
+   - `leo_log` is a project-internal logging function from the `FastUKB` package (or the user's own utility). It accepts `glue`-style `{var}` interpolation and a `level` parameter (`"info"`, `"success"`, `"warning"`, `"error"`). If `leo_log` is not available in the current project, fall back to `cli::cli_alert_info()` / `message()` and note the substitution.
 8. Use `cli::cli_alert_info()` for notifications.
 9. Keep comments left-aligned inside functions; avoid decorative formatting.
 10. Avoid meaningless redundant temporary variables and auxiliary helper functions.
@@ -136,3 +139,9 @@ message(sprintf("remove_unwant_hvg(): kept %d (%.1f%%), removed %d (%.1f%%)", n_
 - Avoid unrelated commentary.
 
 6. Always avoid meaningless redundant temporary variable construction and unnecessary helper functions.
+
+## Smoke Test / 烟测
+- "Format this 200-line analysis script." → Classify as interactive `.R`, keep top-to-bottom order, apply compact style, use `%>%`.
+- "Refactor this exported package function." → Add roxygen2, switch `T/F` to `TRUE/FALSE`, use `Package::function()`, add `leo_log(..., level = "success")`.
+- "Clean up this Rmd." → Keep chunk order aligned with narrative, do not extract helpers to distant chunks.
+- "This script uses `|>` everywhere, reformat it." → Respect the project's pipe choice, do not replace `|>` with `%>%`.

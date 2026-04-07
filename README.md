@@ -48,6 +48,13 @@ Tell Claude: "Install leo-r-style according to instructions at https://github.co
 
 ### Manual Install
 
+**CC Switch:**
+```bash
+git clone https://github.com/laleoarrow/leo-r-style.git ~/agents/leo-r-style
+mkdir -p ~/.cc-switch/skills
+ln -s ~/agents/leo-r-style/skills/leo-r-style ~/.cc-switch/skills/leo-r-style
+```
+
 **Claude Code:**
 ```bash
 git clone https://github.com/laleoarrow/leo-r-style.git ~/agents/leo-r-style
@@ -57,8 +64,10 @@ ln -s ~/agents/leo-r-style/skills/leo-r-style ~/.claude/skills/leo-r-style
 **Codex CLI:**
 ```bash
 git clone https://github.com/laleoarrow/leo-r-style.git ~/agents/leo-r-style
-ln -s ~/agents/leo-r-style/codex/leo-r-style ~/.codex/skills/leo-r-style
+ln -s ~/agents/leo-r-style/skills/leo-r-style ~/.codex/skills/leo-r-style
 ```
+
+Use `skills/leo-r-style` as the canonical install root so Codex, Claude, and cc-switch all load the same files.
 
 ## License
 

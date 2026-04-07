@@ -48,6 +48,13 @@
 
 ### 手动安装
 
+**CC Switch:**
+```bash
+git clone https://github.com/laleoarrow/leo-r-style.git ~/agents/leo-r-style
+mkdir -p ~/.cc-switch/skills
+ln -s ~/agents/leo-r-style/skills/leo-r-style ~/.cc-switch/skills/leo-r-style
+```
+
 **Claude Code:**
 ```bash
 git clone https://github.com/laleoarrow/leo-r-style.git ~/agents/leo-r-style
@@ -57,8 +64,10 @@ ln -s ~/agents/leo-r-style/skills/leo-r-style ~/.claude/skills/leo-r-style
 **Codex CLI:**
 ```bash
 git clone https://github.com/laleoarrow/leo-r-style.git ~/agents/leo-r-style
-ln -s ~/agents/leo-r-style/codex/leo-r-style ~/.codex/skills/leo-r-style
+ln -s ~/agents/leo-r-style/skills/leo-r-style ~/.codex/skills/leo-r-style
 ```
+
+建议统一把 `skills/leo-r-style` 当作规范安装入口，这样各宿主读到的是同一份内容。
 
 ## License
 
