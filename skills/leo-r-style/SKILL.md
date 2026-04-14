@@ -7,21 +7,23 @@ description: Use when writing, refactoring, or standardizing R code in Ao Lu's s
 
 Apply these rules whenever handling R code writing, refactoring, or formatting.
 
-Always enforce this style for R package code and analysis scripts.
+Always enforce this style for R Interactive codes, R package codes and analysis scripts.
 
 ## Workflow / 工作流
 
 1. Identify task type:
+
 - Interactive `.R` analysis file.
 - `Rscript`/CLI `.R` file.
 - `.Rmd` analysis/report file.
 - New R package function.
 - Rewriting an existing function.
 - General R script formatting/refactor.
-2. Apply strict style rules from this file.
-3. Use explicit `Package::function()` for non-base calls in package function bodies.
-4. Run minimal checks after edits (`parse`, and package-context checks when needed).
-5. Format output using the case-specific contract below.
+
+1. Apply strict style rules from this file.
+2. Use explicit `Package::function()` for non-base calls in package function bodies.
+3. Run minimal checks after edits (`parse`, and package-context checks when needed).
+4. Format output using the case-specific contract below.
 
 ## File-Type Gate / 文件类型判定
 
@@ -39,32 +41,42 @@ Classify the target before editing:
 2. Booleans: `T` / `F` are acceptable for brevity in analysis scripts.
    - In **R package code** (`R/` directory), use `TRUE` / `FALSE` to satisfy `R CMD check` and `lintr`. `T`/`F` are only shorthand-safe in interactive `.R` and `.Rmd`.
 3. Naming and formatting:
+
 - Avoid excessive abbreviations (`df` is OK, `tr` is not).
 - Use meaningful snake_case names, for example `leo_log`, `train_path`.
 - Keep one space after commas and around binary operators.
-4. Function structure:
+
+1. Function structure:
+
 - Keep definitions compact; prefer one-line signatures when they fit.
 - Keep `{` on the same line and `}` on its own line.
 - Align wrapped arguments to the opening parenthesis using hanging indent.
-5. Line breaking and compactness (critical):
+
+1. Line breaking and compactness (critical):
+
 - Maximize line usage; do not break lines unless length is roughly over 100-120 chars.
 - Avoid meaningless breaks for calls like `message(sprintf(...))`; keep them one line or compactly wrapped.
 - Break parameters only when there are many (>10) or when logical groups are distinct.
-6. Control flow:
+
+1. Control flow:
+
 - Prefer explicit `for (...) {}` / `if (...) {}` over `map*` for clarity.
 - Keep loops and conditions compact.
-7. Use `leo_log(...)` directly; do not write `leo_log(glue::glue(...))`.
+
+1. Use `leo_log(...)` directly; do not write `leo_log(glue::glue(...))`.
    - `leo_log` is a project-internal logging function from the `FastUKB` package (or the user's own utility). It accepts `glue`-style `{var}` interpolation and a `level` parameter (`"info"`, `"success"`, `"warning"`, `"error"`). If `leo_log` is not available in the current project, fall back to `cli::cli_alert_info()` / `message()` and note the substitution.
-8. Use `cli::cli_alert_info()` for notifications.
-9. Keep comments left-aligned inside functions; avoid decorative formatting.
-10. Avoid meaningless redundant temporary variables and auxiliary helper functions.
-11. Function body section comments:
+2. Use `cli::cli_alert_info()` for notifications.
+3. Keep comments left-aligned inside functions; avoid decorative formatting.
+4. Avoid meaningless redundant temporary variables and auxiliary helper functions.
+5. Function body section comments:
+
 - Use hierarchical section markers for clarity in long functions:
   - Level 1: `# section name ----`
   - Level 2: `## subsection name ----`
 - Place section comments on their own line before the code block they describe.
 - Use English for section names, keep them short and descriptive.
 - Example:
+
 ```r
 leo_cox_mediation <- function(...) {
 
@@ -110,38 +122,49 @@ message(sprintf("remove_unwant_hvg(): kept %d (%.1f%%), removed %d (%.1f%%)", n_
 ## Code Requirements By Case / 分场景代码要求
 
 1. If editing an interactive `.R` analysis file:
+
 - Default to this mode for ambiguous `.R` targets.
-- Keep code in execution order from top to bottom.
-- Put logic where it is used instead of extracting distant helpers.
+- **[CRITICAL / 核心原则] Follow R Core Official Rationale:** As established in *An Introduction to R*, R programs are usually "written for a single piece of data analysis" and statistical analysis is "a series of steps". The `source()` function evaluates files as sequential expressions. Code MUST flow as a step-by-step sequential narrative.
+- **STRICTLY FORBIDDEN:** Do NOT write interactive R scripts like Python modules. NEVER dump all helper or function definitions at the top of the file. This is a common AI mistake. You must actively avoid this.
+- Keep code in strictly execution order from top to bottom.
+- Treat the file as a sourced sequence of analysis commands.
+- Define small helpers immediately before their first real use, or inline the logic if the helper would only be called once.
+- Prefer sectioned analysis flow: setup -> data import -> cleaning -> modeling -> outputs, with each section executable on its own in order.
+- Put logic where it is used instead of extracting it into distant helpers.
 - Avoid meaningless temporary variables and unnecessary helper functions.
 
-2. If editing an `Rscript`/CLI `.R` file:
+1. If editing an `Rscript`/CLI `.R` file:
+
 - Use this mode only when the file header or user context clearly marks it as a script.
 - Keep the entrypoint obvious and preserve argument, config, and output semantics.
 - Keep implementation compact; extract helpers only when they materially improve readability or reuse.
 
-3. If editing an `.Rmd` analysis/report file:
+1. If editing an `.Rmd` analysis/report file:
+
 - Keep chunk order aligned with the narrative and analysis flow.
 - Keep code close to the tables, figures, and results that depend on it.
 - Avoid refactors that hide state transitions across distant chunks.
 
-4. If writing an R package function:
+1. If writing an R package function:
+
 - Add roxygen2 docs (`@param`, `@return`, `@examples`, `@export` as needed).
 - Add `@importFrom package function` for non-base dependencies.
 - In function bodies, call non-base functions as `Package::function()`.
 - Use `cli` prompts for necessary progress updates.
 - Log completion with `leo_log(..., level = "success")`.
 
-5. If rewriting an existing function:
+1. If rewriting an existing function:
+
 - Output only the modified parts.
 - Place modified code first.
 - After code, add concise but vivid reasons for the changes.
 - Avoid unrelated commentary.
 
-6. Always avoid meaningless redundant temporary variable construction and unnecessary helper functions.
+1. Always avoid meaningless redundant temporary variable construction and unnecessary helper functions.
 
 ## Smoke Test / 烟测
-- "Format this 200-line analysis script." → Classify as interactive `.R`, keep top-to-bottom order, apply compact style, use `%>%`.
+
+- "Format this 200-line analysis script." → Classify as interactive `.R`, keep top-to-bottom order (series of steps), apply compact style, use `%>%`. **Never dump functions at the top.**
 - "Refactor this exported package function." → Add roxygen2, switch `T/F` to `TRUE/FALSE`, use `Package::function()`, add `leo_log(..., level = "success")`.
 - "Clean up this Rmd." → Keep chunk order aligned with narrative, do not extract helpers to distant chunks.
 - "This script uses `|>` everywhere, reformat it." → Respect the project's pipe choice, do not replace `|>` with `%>%`.
